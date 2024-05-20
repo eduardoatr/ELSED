@@ -104,7 +104,7 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
   uint8_t direction, gradDir, lineDirection;
   int i, indexInArray, lastChekedPxIdx, initialPxIndex, indexInImage, nElements;
   bool addPixelsForTheFirstSide, inlierOverwritten, popStack, firstBranch, isAnchorFirstPx, wasExtended;
-  bool localSegInitialized, segment;
+  bool localSegInitialized, segment, pxFound;
   Pixel px, lastPx;
   double fitError;
   ImageEdge extensionPixels, outliersList;
@@ -141,6 +141,7 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
     lastChekedPxIdx = initialPxIndex;
     // The current number of inliers
     outliersList.clear();
+    pxFound = false;
     inlierOverwritten = false;
 
     lastPx = calcLastPixelWithDirection(px, direction);
@@ -150,7 +151,9 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
     localSegInitialized = false;
     while (outliersList.size() <= UPM_MAX_OUTLIERS_TH) {
 
-      if (!findNextPxWithGradient(gradDir, gradImg, imageWidth, imageHeight, px, lastPx)) {
+      pxFound = findNextPxWithGradient(gradDir, gradImg, imageWidth, imageHeight, px, lastPx);
+
+      if (!pxFound) {
         // Stopping because the gradient level is 0 or the pixel is out of the image
         break;
       }
@@ -310,7 +313,7 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
       // BRANCH 1
       wasExtended = localSegment->firstEndpointExtended;
       // If we can go on straight forward skipping some pixels do it
-      if ((outliersList.size() > UPM_MAX_OUTLIERS_TH || inlierOverwritten) &&
+      if ((outliersList.size() > UPM_MAX_OUTLIERS_TH || inlierOverwritten || !pxFound) &&
           !wasExtended && treatJunctions && canSegmentBeExtended(*localSegment,
                                                                  true,
                                                                  extensionPixels)) {
