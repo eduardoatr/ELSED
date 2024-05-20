@@ -76,6 +76,9 @@ class FullSegmentInfo {
   //Returns the Pixel in the first extreme of the segment
   inline const Pixel &getLastPixel() const { return lastPx; }
 
+  //Returns the index for Pixel in the second extreme of the segment
+  inline const int getLastPixelIndex() const { return lastPxIndex; }
+
   // Returns a pointer to the first pixel of the segment
   inline const Pixel *begin() const { return &((*pixels)[firstPxIndex]); }
 

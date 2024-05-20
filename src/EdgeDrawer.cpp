@@ -102,7 +102,7 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
 
   // The index in the pixels array of the last segment we have tried to add
   uint8_t direction, gradDir, lineDirection;
-  int i, indexInArray, lastChekedPxIdx, initialPxIndex, indexInImage, nElements;
+  int i, indexInArray, lastChekedPxIdx, initialPxIndex, indexInImage, nElements, minSize;
   bool addPixelsForTheFirstSide, inlierOverwritten, popStack, firstBranch, isAnchorFirstPx, wasExtended;
   bool localSegInitialized, segment;
   Pixel px, lastPx;
@@ -205,8 +205,12 @@ void EdgeDrawer::drawEdgeTreeStack(Pixel anchor, ImageEdge &initialPixels, bool 
         // Mark the pixel as edge only if it is an inlier
         edgeImg[indexInArray] = UPM_ED_EDGE_PIXEL;
 
+        minSize = localSegInitialized
+          ? localSegment->getLastPixelIndex() + 1 + UPM_SKIP_EDGE_PT
+          : lastChekedPxIdx + minLineLength;
+
         // If there are enough pixels try to fit a segment to them
-        if (pixels.size() - lastChekedPxIdx >= minLineLength) {
+        if (pixels.size() >= minSize) {
           //If we have already set the first minLineLength pixels, just add the new UPM_SKIP_EDGE_PT ones
           if (localSegInitialized) {
             localSegment->skipPositions();
